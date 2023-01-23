@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Vanilo\Mollie\Messages;
 
 use Konekt\Enum\Enum;
+use Vanilo\Mollie\Models\MollieStatus;
 use Vanilo\Payment\Contracts\PaymentResponse;
 use Vanilo\Payment\Contracts\PaymentStatus;
 use Vanilo\Payment\Models\PaymentStatusProxy;
-use Vanilo\Mollie\Models\MollieStatus;
-
 
 class MolliePaymentResponse implements PaymentResponse
 {

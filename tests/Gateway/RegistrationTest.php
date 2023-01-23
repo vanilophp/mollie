@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Vanilo\Mollie\Tests\Gateway;
 
-use Vanilo\Payment\Contracts\PaymentGateway;
-use Vanilo\Payment\PaymentGateways;
 use Vanilo\Mollie\MolliePaymentGateway;
 use Vanilo\Mollie\Tests\TestCase;
+use Vanilo\Payment\Contracts\PaymentGateway;
+use Vanilo\Payment\PaymentGateways;
 
 class RegistrationTest extends TestCase
 {
