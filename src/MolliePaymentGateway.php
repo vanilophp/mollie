@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Vanilo\Mollie;
 
-use Braintree\Transaction;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Vanilo\Braintree\Messages\BraintreePaymentResponse;
 use Vanilo\Contracts\Address;
 use Vanilo\Mollie\Messages\MolliePaymentRequest;
 use Vanilo\Mollie\Messages\MolliePaymentResponse;

@@ -12,8 +12,7 @@ trait HasMollieInteraction
 
     public function __construct(
         private string $apiKey,
-    )
-    {
+    ) {
         $this->apiClient = (new MollieApiClient())->setApiKey($this->apiKey);
     }
 }

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Vanilo\Mollie\Messages;
 
 use Illuminate\Support\Facades\View;
+use Mollie\Api\Resources\Payment;
 use Vanilo\Mollie\Concerns\HasMollieInteraction;
 use Vanilo\Payment\Contracts\PaymentRequest;
-use Mollie\Api\Resources\Payment;
 
 class MolliePaymentRequest implements PaymentRequest
 {
@@ -32,7 +32,7 @@ class MolliePaymentRequest implements PaymentRequest
         $this->molliePayment = $this->apiClient->payments->create([
             "amount" => [
                 "currency" => $this->currency,
-                "value" => (string)number_format($this->amount, 2, '.', ''),
+                "value" => (string) number_format($this->amount, 2, '.', ''),
             ],
             "description" => "Payment for $this->paymentId",
             "redirectUrl" => $this->redirectUrl,
@@ -100,7 +100,6 @@ class MolliePaymentRequest implements PaymentRequest
 
         return $this;
     }
-
 
     public function setView(string $view): self
     {

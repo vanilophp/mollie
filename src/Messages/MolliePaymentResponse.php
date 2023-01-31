@@ -33,7 +33,7 @@ class MolliePaymentResponse implements PaymentResponse
 
         $this->nativeStatus = new MollieStatus($payment->status);
         $this->transactionId = $payment->id;
-        $this->amountPaid = (float)$payment->amount->value;
+        $this->amountPaid = (float) $payment->amount->value;
         $this->paymentId = $payment->metadata->payment_id;
 
         if ($payment->isFailed()) {
