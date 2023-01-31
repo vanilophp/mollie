@@ -8,26 +8,43 @@ use Konekt\Enum\Enum;
 
 class MollieStatus extends Enum
 {
-    // Feel free to rename this class to whatever it
-    // represents at the specific payment gateway
-    // but please keep the "Mollie" class prefix.
-    // Examples:
-    // - "MollieTransactionStatus",
-    // - "MollieOrderStatus",
-    // - "MolliePaymentStatus",
-    // - "MollieInvoiceStatus",
-    // - etc.
+    /**
+     * The payment has just been created, no action has happened on it yet.
+     */
+    public const STATUS_OPEN = "open";
 
-    // Add constants as possible values.
-    // See: https://vanilo.io/docs/2.x/enums
+    /**
+     * The payment has just been started, no final confirmation yet.
+     */
+    public const STATUS_PENDING = "pending";
 
-    // The values below are just examples, take the actual
-    // list of possible values from the Mollie documentation:
-    public const CREATED = 'created';
-    public const PENDING_OK = 'pending_ok';
-    public const INVALID_DATA = 'invalid_data';
-    public const FRAUD_CHECK = 'fraud_check';
-    public const AUTH_OK = 'auth_ok';
-    public const CAPTURED = 'captured';
-    public const FRAUD_DETECTED = 'fraud_detected';
+    /**
+     * The payment is authorized, but captures still need to be created in order to receive the money.
+     *
+     * This is currently only possible for Klarna Pay later and Klarna Slice it. Payments with these payment methods can
+     * only be created with the Orders API. You should create a Shipment to trigger the capture to receive the money.
+     *
+     * @see https://docs.mollie.com/reference/v2/shipments-api/create-shipment
+     */
+    public const STATUS_AUTHORIZED = "authorized";
+
+    /**
+     * The customer has canceled the payment.
+     */
+    public const STATUS_CANCELED = "canceled";
+
+    /**
+     * The payment has expired due to inaction of the customer.
+     */
+    public const STATUS_EXPIRED = "expired";
+
+    /**
+     * The payment has been paid.
+     */
+    public const STATUS_PAID = "paid";
+
+    /**
+     * The payment has failed.
+     */
+    public const STATUS_FAILED = "failed";
 }

@@ -10,5 +10,5 @@ return [
         'id' => MolliePaymentGateway::DEFAULT_ID
     ],
     'bind' => true,
-    'xxx' => env('MOLLIE_Mollie'),
+    'api_key' => env('MOLLIE_API_KEY'),
 ];

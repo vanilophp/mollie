@@ -1,14 +1,10 @@
-<p>This is a sample payment requests form. Modify it according to the Payment Gateway you're implementing</p>
+@if($autoRedirect)
+    <p>{{ __('You will be redirected to the secure payment page') }}</p>
+    <script>
+             window.location.href = '{{ $url }}'
+    </script>
+@endif
 
-<form method="post" action="{{ $url }}" name="mollie" target="_self">
-    @if($autoRedirect)
-        <p>{{ __('You will be redirected to the secure payment page') }}</p>
-        <p>
-            <img src="{{ $url }}" alt="" title=""
-                 onload="javascript:document.mollie.submit()">
-        </p>
-    @endif
-        <button type="submit">
-            {{ __('Proceed to Payment') }}
-        </button>
-</form>
+<a href="{{ $url }}" type="submit">
+    {{ __('Proceed to Payment') }}
+</a>

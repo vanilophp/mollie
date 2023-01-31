@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Vanilo\Mollie\Messages;
 
 use Konekt\Enum\Enum;
+use Vanilo\Mollie\Concerns\HasMollieInteraction;
 use Vanilo\Mollie\Models\MollieStatus;
 use Vanilo\Payment\Contracts\PaymentResponse;
 use Vanilo\Payment\Contracts\PaymentStatus;
@@ -12,6 +13,8 @@ use Vanilo\Payment\Models\PaymentStatusProxy;
 
 class MolliePaymentResponse implements PaymentResponse
 {
+    use HasMollieInteraction;
+
     private string $paymentId;
 
     private ?float $amountPaid;
@@ -24,29 +27,29 @@ class MolliePaymentResponse implements PaymentResponse
 
     private ?string $transactionId;
 
-    public function __construct(
-        string $paymentId,
-        MollieStatus $nativeStatus,
-        string $message,
-        ?float $amountPaid = null,
-        ?string $transactionId = null
-    ) {
-        // Arguments are just an example here, feel free, to modify
-        $this->paymentId = $paymentId;
-        $this->nativeStatus = $nativeStatus;
-        $this->amountPaid = $amountPaid;
-        $this->message = $message;
-        $this->transactionId = $transactionId;
+    public function process(string $remoteId): self
+    {
+        $payment = $this->apiClient->payments->get($remoteId);
+
+        $this->nativeStatus = new MollieStatus($payment->status);
+        $this->transactionId = $payment->id;
+        $this->amountPaid = (float)$payment->amount->value;
+        $this->paymentId = $payment->metadata->payment_id;
+
+        if ($payment->isFailed()) {
+            $this->message = $payment->details->failureMessage;
+        }
+
+        return $this;
     }
 
     public function wasSuccessful(): bool
     {
-        // implement it based on the gateway logic
+        return $this->getStatus()->isPending() || $this->getStatus()->isAuthorized() || $this->getStatus()->isPaid();
     }
 
     public function getMessage(): string
     {
-        // Just an example, feel free to implement a different logic
         return $this->message ?? $this->nativeStatus->label();
     }
 
@@ -70,37 +73,25 @@ class MolliePaymentResponse implements PaymentResponse
     public function getStatus(): PaymentStatus
     {
         if (null === $this->status) {
-            // Obtain the mapped status from the transaction
-            // it usually takes the native status, message
-            // or other data from the gateway callback
-            // and applies mapping to Vanilo Status
-
-            // Use the `PaymentStatusProxy` when creating values
-            // in order to keep the status enum customizable
-
-            // >>> **Example** for mapping status from the native status
             switch ($this->getNativeStatus()->value()) {
-                case MollieStatus::CREATED:
-                case MollieStatus::PENDING_OK:
+                case MollieStatus::STATUS_OPEN:
+                case MollieStatus::STATUS_PENDING:
                     $this->status = PaymentStatusProxy::PENDING();
                     break;
-                case MollieStatus::AUTH_OK:
+                case MollieStatus::STATUS_AUTHORIZED:
                     $this->status = PaymentStatusProxy::AUTHORIZED();
                     break;
-                case MollieStatus::INVALID_DATA:
-                case MollieStatus::FRAUD_DETECTED:
+                case MollieStatus::STATUS_CANCELED:
+                case MollieStatus::STATUS_EXPIRED:
+                case MollieStatus::STATUS_FAILED:
                     $this->status = PaymentStatusProxy::DECLINED();
                     break;
-                case MollieStatus::CAPTURED:
+                case MollieStatus::STATUS_PAID:
                     $this->status = PaymentStatusProxy::PAID();
-                    break;
-                case MollieStatus::FRAUD_CHECK:
-                    $this->status = PaymentStatusProxy::ON_HOLD();
                     break;
                 default:
                     $this->status = PaymentStatusProxy::DECLINED();
             }
-            // End of Example <<<
         }
 
         return $this->status;

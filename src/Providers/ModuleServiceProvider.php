@@ -24,7 +24,7 @@ class ModuleServiceProvider extends BaseModuleServiceProvider
         if ($this->config('bind', true)) {
             $this->app->bind(MolliePaymentGateway::class, function ($app) {
                 return new MolliePaymentGateway(
-                    $this->config('xxx') // @todo replace with real
+                    $this->config('api_key')
                 );
             });
         }

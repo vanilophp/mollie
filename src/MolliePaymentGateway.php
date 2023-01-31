@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace Vanilo\Mollie;
 
+use Braintree\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Vanilo\Braintree\Messages\BraintreePaymentResponse;
 use Vanilo\Contracts\Address;
+use Vanilo\Mollie\Messages\MolliePaymentRequest;
+use Vanilo\Mollie\Messages\MolliePaymentResponse;
 use Vanilo\Payment\Contracts\Payment;
 use Vanilo\Payment\Contracts\PaymentGateway;
 use Vanilo\Payment\Contracts\PaymentRequest;
@@ -15,6 +20,10 @@ class MolliePaymentGateway implements PaymentGateway
 {
     public const DEFAULT_ID = 'mollie';
 
+    public function __construct(private string $apiKey)
+    {
+    }
+
     public static function getName(): string
     {
         return 'Mollie';
@@ -22,12 +31,18 @@ class MolliePaymentGateway implements PaymentGateway
 
     public function createPaymentRequest(Payment $payment, Address $shippingAddress = null, array $options = []): PaymentRequest
     {
-        // @todo implement
+        return (new MolliePaymentRequest($this->apiKey))
+            ->setPaymentId($payment->getPaymentId())
+            ->setAmount($payment->getAmount())
+            ->setCurrency($payment->getCurrency())
+            ->setWebhookUrl($options['webhookUrl'])
+            ->setRedirectUrl($options['redirectUrl'])
+            ->create();
     }
 
-    public function processPaymentResponse(Request $request, array $options = []): PaymentResponse
+    public function processPaymentResponse(Request|string $request, array $options = []): PaymentResponse
     {
-        // @todo implement
+        return (new MolliePaymentResponse($this->apiKey))->process($request);
     }
 
     public function isOffline(): bool
