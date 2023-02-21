@@ -29,16 +29,12 @@ class MolliePaymentResponse implements PaymentResponse
 
     public function process(string $remoteId): self
     {
-        $payment = $this->apiClient->payments->get($remoteId);
+        $order = $this->apiClient->orders->get($remoteId);
 
-        $this->nativeStatus = new MollieStatus($payment->status);
-        $this->transactionId = $payment->id;
-        $this->amountPaid = (float) $payment->amount->value;
-        $this->paymentId = $payment->metadata->payment_id;
-
-        if ($payment->isFailed()) {
-            $this->message = $payment->details->failureMessage;
-        }
+        $this->nativeStatus = new MollieStatus($order->status);
+        $this->transactionId = $order->id;
+        $this->amountPaid = (float) $order->amount->value;
+        $this->paymentId = $order->metadata->payment_id;
 
         return $this;
     }
@@ -74,7 +70,7 @@ class MolliePaymentResponse implements PaymentResponse
     {
         if (null === $this->status) {
             switch ($this->getNativeStatus()->value()) {
-                case MollieStatus::STATUS_OPEN:
+                case MollieStatus::STATUS_CREATED:
                 case MollieStatus::STATUS_PENDING:
                     $this->status = PaymentStatusProxy::PENDING();
                     break;
@@ -83,10 +79,10 @@ class MolliePaymentResponse implements PaymentResponse
                     break;
                 case MollieStatus::STATUS_CANCELED:
                 case MollieStatus::STATUS_EXPIRED:
-                case MollieStatus::STATUS_FAILED:
                     $this->status = PaymentStatusProxy::DECLINED();
                     break;
                 case MollieStatus::STATUS_PAID:
+                case MollieStatus::STATUS_COMPLETED:
                     $this->status = PaymentStatusProxy::PAID();
                     break;
                 default:

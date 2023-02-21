@@ -29,12 +29,9 @@ class MolliePaymentGateway implements PaymentGateway
     public function createPaymentRequest(Payment $payment, Address $shippingAddress = null, array $options = []): PaymentRequest
     {
         return (new MolliePaymentRequest($this->apiKey))
-            ->setPaymentId($payment->getPaymentId())
-            ->setAmount($payment->getAmount())
-            ->setCurrency($payment->getCurrency())
             ->setWebhookUrl($options['webhookUrl'])
             ->setRedirectUrl($options['redirectUrl'])
-            ->create();
+            ->create($payment);
     }
 
     public function processPaymentResponse(Request|string $request, array $options = []): PaymentResponse
