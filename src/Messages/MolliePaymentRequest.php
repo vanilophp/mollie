@@ -174,7 +174,6 @@ class MolliePaymentRequest implements PaymentRequest
 
     private function formatPrice($price): string
     {
-        return (string)number_format($price, 2, '.', '');
+        return (string) number_format($price, 2, '.', '');
     }
 }
-
