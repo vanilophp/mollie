@@ -2,6 +2,7 @@
     "name": "vanilo/mollie",
     "description": "Mollie Payment Gateway Support for Vanilo (Laravel)",
     "type": "library",
+    "keywords": ["laravel", "vanilo", "mollie", "payments"],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "license": "MIT",
