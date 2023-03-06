@@ -28,8 +28,8 @@ final class RequestFactory
     {
         $paymentRequest = new MolliePaymentRequest(
             $this->apiKey,
-            $this->url($payment, 'webhook', $webhookUrl),
             $this->url($payment, 'redirect', $redirectUrl),
+            $this->url($payment, 'webhook', $webhookUrl),
         );
 
         if (null !== $view) {
