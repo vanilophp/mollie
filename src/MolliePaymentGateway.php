@@ -6,7 +6,8 @@ namespace Vanilo\Mollie;
 
 use Illuminate\Http\Request;
 use Vanilo\Contracts\Address;
-use Vanilo\Mollie\Messages\MolliePaymentRequest;
+use Vanilo\Mollie\Concerns\HasFullMollieConstructor;
+use Vanilo\Mollie\Factories\RequestFactory;
 use Vanilo\Mollie\Messages\MolliePaymentResponse;
 use Vanilo\Payment\Contracts\Payment;
 use Vanilo\Payment\Contracts\PaymentGateway;
@@ -15,11 +16,11 @@ use Vanilo\Payment\Contracts\PaymentResponse;
 
 class MolliePaymentGateway implements PaymentGateway
 {
+    use HasFullMollieConstructor;
+
     public const DEFAULT_ID = 'mollie';
 
-    public function __construct(private string $apiKey)
-    {
-    }
+    private ?RequestFactory $requestFactory = null;
 
     public static function getName(): string
     {
@@ -28,10 +29,12 @@ class MolliePaymentGateway implements PaymentGateway
 
     public function createPaymentRequest(Payment $payment, Address $shippingAddress = null, array $options = []): PaymentRequest
     {
-        return (new MolliePaymentRequest($this->apiKey))
-            ->setWebhookUrl($options['webhookUrl'])
-            ->setRedirectUrl($options['redirectUrl'])
-            ->create($payment);
+        return $this->requestFactory()->create(
+            $payment,
+            $options['redirect_url'] ?? $this->redirectUrl,
+            $options['webhook_url'] ?? $this->webhookUrl,
+            $options['view'] ?? null,
+        );
     }
 
     public function processPaymentResponse(Request|string $request, array $options = []): PaymentResponse
@@ -42,5 +45,14 @@ class MolliePaymentGateway implements PaymentGateway
     public function isOffline(): bool
     {
         return false;
+    }
+
+    private function requestFactory(): RequestFactory
+    {
+        if (null === $this->requestFactory) {
+            $this->requestFactory = new RequestFactory($this->apiKey);
+        }
+
+        return $this->requestFactory;
     }
 }

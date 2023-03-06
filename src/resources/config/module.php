@@ -11,4 +11,6 @@ return [
     ],
     'bind' => true,
     'api_key' => env('MOLLIE_API_KEY'),
+    'redirect_url' => env('MOLLIE_REDIRECT_URL', ''),
+    'webhook_url' => env('MOLLIE_CONFIRM_URL', ''),
 ];

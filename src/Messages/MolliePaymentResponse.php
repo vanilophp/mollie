@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Vanilo\Mollie\Messages;
 
 use Konekt\Enum\Enum;
-use Vanilo\Mollie\Concerns\HasMollieInteraction;
+use Vanilo\Mollie\Concerns\HasApiKeyConstructor;
+use Vanilo\Mollie\Concerns\InteractsWithMollieApi;
 use Vanilo\Mollie\Models\MollieStatus;
 use Vanilo\Payment\Contracts\PaymentResponse;
 use Vanilo\Payment\Contracts\PaymentStatus;
@@ -13,7 +14,8 @@ use Vanilo\Payment\Models\PaymentStatusProxy;
 
 class MolliePaymentResponse implements PaymentResponse
 {
-    use HasMollieInteraction;
+    use InteractsWithMollieApi;
+    use HasApiKeyConstructor;
 
     private string $paymentId;
 
@@ -29,7 +31,7 @@ class MolliePaymentResponse implements PaymentResponse
 
     public function process(string $remoteId): self
     {
-        $order = $this->apiClient->orders->get($remoteId);
+        $order = $this->mollie()->orders->get($remoteId);
 
         $this->nativeStatus = new MollieStatus($order->status);
         $this->transactionId = $order->id;

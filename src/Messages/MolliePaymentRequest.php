@@ -6,23 +6,21 @@ namespace Vanilo\Mollie\Messages;
 
 use Illuminate\Support\Facades\View;
 use Mollie\Api\Resources\Order;
-use Vanilo\Mollie\Concerns\HasMollieInteraction;
+use Vanilo\Mollie\Concerns\HasFullMollieConstructor;
+use Vanilo\Mollie\Concerns\InteractsWithMollieApi;
 use Vanilo\Payment\Contracts\Payment;
 use Vanilo\Payment\Contracts\PaymentRequest;
 
 class MolliePaymentRequest implements PaymentRequest
 {
-    use HasMollieInteraction;
+    use InteractsWithMollieApi;
+    use HasFullMollieConstructor;
 
     private string $paymentId;
 
     private string $currency;
 
     private float $amount;
-
-    private string $redirectUrl;
-
-    private string $webhookUrl;
 
     private string $view = 'mollie::_request';
 
@@ -32,7 +30,7 @@ class MolliePaymentRequest implements PaymentRequest
     {
         $billPayer = $payment->getPayable()->getBillpayer();
 
-        $this->molliePayment = $this->apiClient->orders->create([
+        $this->molliePayment = $this->mollie()->orders->create([
             'amount' => [
                 'currency' => $payment->getCurrency(),
                 'value' => $this->formatPrice($payment->getAmount()),
