@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Vanilo\Mollie\Messages;
 
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\View;
 use Mollie\Api\Resources\Order;
 use Vanilo\Contracts\Payable;
@@ -16,6 +17,11 @@ class MolliePaymentRequest implements PaymentRequest
 {
     use InteractsWithMollieApi;
     use HasFullMollieConstructor;
+
+    private const SUPPORTED_LOCALES = [
+        'en_US', 'en_GB', 'nl_NL', 'nl_BE', 'fr_FR', 'fr_BE', 'de_DE', 'de_AT', 'de_CH', 'es_ES', 'ca_ES',
+        'pt_PT', 'it_IT', 'nb_NO', 'sv_SE', 'fi_FI', 'da_DK', 'is_IS', 'hu_HU', 'pl_PL', 'lv_LV', 'lt_LT',
+    ];
 
     private string $paymentId;
 
@@ -37,7 +43,7 @@ class MolliePaymentRequest implements PaymentRequest
                 'value' => $this->formatPrice($payment->getAmount()),
             ],
             'orderNumber' => $payment->getPayable()->getTitle(),
-            'locale' => 'en_US',
+            'locale' => $this->calculateLocale($payment),
             'billingAddress' => [
                 'givenName' => $billPayer->getFirstName(),
                 'familyName' => $billPayer->getLastName(),
@@ -152,7 +158,9 @@ class MolliePaymentRequest implements PaymentRequest
             })->toArray();
         }
 
-        $result[] = $this->getAdjustments($payable, $currency);
+        if (!empty($adjustments = $this->getAdjustments($payable, $currency))) {
+            $result = array_merge($result, $adjustments);
+        }
 
         if (empty($result)) {
             $result[] = [
@@ -188,15 +196,15 @@ class MolliePaymentRequest implements PaymentRequest
         $result = [];
 
         if (method_exists($payable, 'adjustments') &&
-            class_exists('\Vanilo\Adjustments\Contracts\AdjustmentCollection') &&
-            $adjustments = $payable->adjustments() instanceof \Vanilo\Adjustments\Contracts\AdjustmentCollection
+            interface_exists('\Vanilo\Adjustments\Contracts\AdjustmentCollection') &&
+            ($adjustments = $payable->adjustments()) instanceof \Vanilo\Adjustments\Contracts\AdjustmentCollection
         ) {
-            foreach ($payable->adjustments as $adjustment) {
-                if (!$adjustment->isIncluded() && 0.0 !== $adjustments->getAmount()) {
+            foreach ($adjustments as $adjustment) {
+                if (!$adjustment->isIncluded() && 0.0 !== $adjustment->getAmount()) {
                     $result[] = [
-                        'name' => $adjustment->getTitle ?: ($adjustment->getType()->label() . ' ' . $adjustment->isCredit() ? __('discount') : __('fee')),
+                        'name' => $adjustment->getTitle() ?: ($adjustment->getType()->label() . ' ' . $adjustment->isCredit() ? __('discount') : __('fee')),
                         'quantity' => 1,
-                        'sku' => $adjustment->id ?? 'N/A',
+                        'sku' => (string) $adjustment->id ?? 'N/A',
                         'unitPrice' => [
                             'currency' => $currency,
                             'value' => $this->formatPrice($adjustment->getAmount()),
@@ -216,5 +224,67 @@ class MolliePaymentRequest implements PaymentRequest
         }
 
         return $result;
+    }
+
+    private function calculateLocale(Payment $payment): string
+    {
+        $locale = $this->guessPaymentLocale($payment);
+        if (!is_null($locale)) {
+            if ($this->isSupportedLocale($locale) || $this->looksLikeALocale($locale)) {
+                return $locale;
+            }
+        }
+
+        $locale = $this->guessAppLocale($payment);
+        if (!is_null($locale)) {
+            if ($this->isSupportedLocale($locale) || $this->looksLikeALocale($locale)) {
+                return $locale;
+            }
+        }
+
+        return 'en_US';
+    }
+
+    private function guessPaymentLocale(Payment $payment): ?string
+    {
+        $payable = $payment->getPayable();
+        if (!method_exists($payable, 'getLanguage')) {
+            return null;
+        }
+
+        if (!is_string($lang = $payable->getLanguage())) {
+            return null;
+        }
+
+        return match (strlen($lang)) {
+            2 => $lang . '_' . $payable->getBillpayer()->getBillingAddress()->getCountryCode(),
+            5 => $lang,
+            default => null,
+        };
+    }
+
+    private function guessAppLocale(Payment $payment): ?string
+    {
+        if (!is_string($lang = App::currentLocale())) {
+            return null;
+        }
+
+        return match (strlen($lang)) {
+            2 => $lang . '_' . $payment->getPayable()->getBillpayer()->getBillingAddress()->getCountryCode(),
+            5 => $lang,
+            default => null,
+        };
+    }
+
+    private function isSupportedLocale(string $locale): bool
+    {
+        return in_array($locale, self::SUPPORTED_LOCALES);
+    }
+
+    private function looksLikeALocale(string $locale): bool
+    {
+        return
+            5 === strlen($locale) &&
+            preg_match('/[a-zA-Z][a-zA-Z]_[a-zA-Z][a-zA-Z]/', $locale);
     }
 }
