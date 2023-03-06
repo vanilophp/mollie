@@ -71,25 +71,19 @@ class MolliePaymentResponse implements PaymentResponse
     public function getStatus(): PaymentStatus
     {
         if (null === $this->status) {
-            switch ($this->getNativeStatus()->value()) {
-                case MollieStatus::STATUS_CREATED:
-                case MollieStatus::STATUS_PENDING:
-                    $this->status = PaymentStatusProxy::PENDING();
-                    break;
-                case MollieStatus::STATUS_AUTHORIZED:
-                    $this->status = PaymentStatusProxy::AUTHORIZED();
-                    break;
-                case MollieStatus::STATUS_CANCELED:
-                case MollieStatus::STATUS_EXPIRED:
-                    $this->status = PaymentStatusProxy::DECLINED();
-                    break;
-                case MollieStatus::STATUS_PAID:
-                case MollieStatus::STATUS_COMPLETED:
-                    $this->status = PaymentStatusProxy::PAID();
-                    break;
-                default:
-                    $this->status = PaymentStatusProxy::DECLINED();
-            }
+            /** @see https://docs.mollie.com/orders/status-changes */
+            $this->status = match ($this->getNativeStatus()->value()) {
+                MollieStatus::STATUS_CREATED => PaymentStatusProxy::PENDING(),
+                MollieStatus::STATUS_PENDING => PaymentStatusProxy::ON_HOLD(),
+                MollieStatus::STATUS_AUTHORIZED => PaymentStatusProxy::AUTHORIZED(),
+                MollieStatus::STATUS_CANCELED => PaymentStatusProxy::CANCELLED(),
+                MollieStatus::STATUS_EXPIRED => PaymentStatusProxy::TIMEOUT(),
+                MollieStatus::STATUS_PAID => PaymentStatusProxy::PAID(),
+                MollieStatus::STATUS_SHIPPING => PaymentStatusProxy::PAID(),
+                MollieStatus::STATUS_COMPLETED => PaymentStatusProxy::PAID(),
+                MollieStatus::STATUS_REFUNDED => PaymentStatusProxy::REFUNDED(),
+                default => PaymentStatusProxy::ON_HOLD(),// Shouldn't happen, but it worth checking
+            };
         }
 
         return $this->status;
