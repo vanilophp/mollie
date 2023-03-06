@@ -209,8 +209,8 @@ class MolliePaymentRequest implements PaymentRequest
                     ];
                 }
             }
-
-            return $result;
         }
+
+        return $result;
     }
 }
