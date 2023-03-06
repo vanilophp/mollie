@@ -154,24 +154,28 @@ class MolliePaymentRequest implements PaymentRequest
 
         $result[] = $this->getAdjustments($payable, $currency);
 
-        return [
-            'name' => 'Orders total',
-            'quantity' => 1,
-            'sku' => 'N/A',
-            'unitPrice' => [
-                'currency' => $currency,
-                'value' => $this->formatPrice($payable->getAmount()),
-            ],
-            'totalAmount' => [
-                'currency' => $currency,
-                'value' => $this->formatPrice($payable->getAmount()),
-            ],
-            'vatRate' => 0,
-            'vatAmount' => [
-                "currency" => $currency,
-                "value" => "0.00",
-            ],
-        ];
+        if (empty($result)) {
+            $result[] = [
+                'name' => 'Orders total',
+                'quantity' => 1,
+                'sku' => 'N/A',
+                'unitPrice' => [
+                    'currency' => $currency,
+                    'value' => $this->formatPrice($payable->getAmount()),
+                ],
+                'totalAmount' => [
+                    'currency' => $currency,
+                    'value' => $this->formatPrice($payable->getAmount()),
+                ],
+                'vatRate' => 0,
+                'vatAmount' => [
+                    "currency" => $currency,
+                    "value" => "0.00",
+                ],
+            ];
+        }
+
+        return $result;
     }
 
     private function formatPrice($price): string
