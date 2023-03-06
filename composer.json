@@ -14,8 +14,8 @@
     "require": {
         "php": "^8.0",
         "konekt/concord": "^1.10.2",
-        "vanilo/payment": "^3.0",
-        "vanilo/contracts": "^3.0",
+        "vanilo/payment": "^3.6",
+        "vanilo/contracts": "^3.6",
         "mollie/mollie-api-php": "^2.0"
     },
     "autoload": {
