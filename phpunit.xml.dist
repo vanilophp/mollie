@@ -16,5 +16,6 @@
   </testsuites>
   <php>
     <env name="APP_DEBUG" value="true"/>
+    <env name="MOLLIE_API_KEY" value="123456"/>
   </php>
 </phpunit>
