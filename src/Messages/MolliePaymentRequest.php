@@ -6,6 +6,7 @@ namespace Vanilo\Mollie\Messages;
 
 use Illuminate\Support\Facades\View;
 use Mollie\Api\Resources\Order;
+use Vanilo\Contracts\Payable;
 use Vanilo\Mollie\Concerns\HasFullMollieConstructor;
 use Vanilo\Mollie\Concerns\InteractsWithMollieApi;
 use Vanilo\Payment\Contracts\Payment;
@@ -127,8 +128,9 @@ class MolliePaymentRequest implements PaymentRequest
         $payable = $payment->getPayable();
         $currency = $payment->getCurrency();
 
+        $result = [];
         if (method_exists($payable, 'getItems')) {
-            return $payable->getItems()->map(function ($item) use ($currency) {
+            $result = $payable->getItems()->map(function ($item) use ($currency) {
                 return [
                     'name' => $item->name,
                     'quantity' => $item->quantity,
@@ -149,6 +151,8 @@ class MolliePaymentRequest implements PaymentRequest
                 ];
             })->toArray();
         }
+
+        $result[] = $this->getAdjustments($payable, $currency);
 
         return [
             'name' => 'Orders total',
@@ -173,5 +177,40 @@ class MolliePaymentRequest implements PaymentRequest
     private function formatPrice($price): string
     {
         return (string) number_format($price, 2, '.', '');
+    }
+
+    private function getAdjustments(Payable $payable, string $currency): array
+    {
+        $result = [];
+
+        if (method_exists($payable, 'adjustments') &&
+            class_exists('\Vanilo\Adjustments\Contracts\AdjustmentCollection') &&
+            $adjustments = $payable->adjustments() instanceof \Vanilo\Adjustments\Contracts\AdjustmentCollection
+        ) {
+            foreach ($payable->adjustments as $adjustment) {
+                if (!$adjustment->isIncluded() && 0.0 !== $adjustments->getAmount()) {
+                    $result[] = [
+                        'name' => $adjustment->getTitle ?: ($adjustment->getType()->label() . ' ' . $adjustment->isCredit() ? __('discount') : __('fee')),
+                        'quantity' => 1,
+                        'sku' => $adjustment->id ?? 'N/A',
+                        'unitPrice' => [
+                            'currency' => $currency,
+                            'value' => $this->formatPrice($adjustment->getAmount()),
+                        ],
+                        'totalAmount' => [
+                            'currency' => $currency,
+                            'value' => $this->formatPrice($adjustment->getAmount()),
+                        ],
+                        'vatRate' => 0,
+                        'vatAmount' => [
+                            "currency" => $currency,
+                            "value" => "0.00",
+                        ],
+                    ];
+                }
+            }
+
+            return $result;
+        }
     }
 }
