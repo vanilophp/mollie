@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Vanilo\Mollie\Messages;
 
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\View;
 use Mollie\Api\Resources\Order;
 use Vanilo\Contracts\Payable;
 use Vanilo\Mollie\Concerns\HasFullMollieConstructor;
 use Vanilo\Mollie\Concerns\InteractsWithMollieApi;
+use Vanilo\Mollie\Utils\LocaleResolver;
 use Vanilo\Payment\Contracts\Payment;
 use Vanilo\Payment\Contracts\PaymentRequest;
 
@@ -17,11 +17,6 @@ class MolliePaymentRequest implements PaymentRequest
 {
     use InteractsWithMollieApi;
     use HasFullMollieConstructor;
-
-    private const SUPPORTED_LOCALES = [
-        'en_US', 'en_GB', 'nl_NL', 'nl_BE', 'fr_FR', 'fr_BE', 'de_DE', 'de_AT', 'de_CH', 'es_ES', 'ca_ES',
-        'pt_PT', 'it_IT', 'nb_NO', 'sv_SE', 'fi_FI', 'da_DK', 'is_IS', 'hu_HU', 'pl_PL', 'lv_LV', 'lt_LT',
-    ];
 
     private string $paymentId;
 
@@ -43,7 +38,7 @@ class MolliePaymentRequest implements PaymentRequest
                 'value' => $this->formatPrice($payment->getAmount()),
             ],
             'orderNumber' => $payment->getPayable()->getTitle(),
-            'locale' => $this->calculateLocale($payment),
+            'locale' => LocaleResolver::makeAnEducatedGuess($payment),
             'billingAddress' => [
                 'givenName' => $billPayer->getFirstName(),
                 'familyName' => $billPayer->getLastName(),
@@ -224,67 +219,5 @@ class MolliePaymentRequest implements PaymentRequest
         }
 
         return $result;
-    }
-
-    private function calculateLocale(Payment $payment): string
-    {
-        $locale = $this->guessPaymentLocale($payment);
-        if (!is_null($locale)) {
-            if ($this->isSupportedLocale($locale) || $this->looksLikeALocale($locale)) {
-                return $locale;
-            }
-        }
-
-        $locale = $this->guessAppLocale($payment);
-        if (!is_null($locale)) {
-            if ($this->isSupportedLocale($locale) || $this->looksLikeALocale($locale)) {
-                return $locale;
-            }
-        }
-
-        return 'en_US';
-    }
-
-    private function guessPaymentLocale(Payment $payment): ?string
-    {
-        $payable = $payment->getPayable();
-        if (!method_exists($payable, 'getLanguage')) {
-            return null;
-        }
-
-        if (!is_string($lang = $payable->getLanguage())) {
-            return null;
-        }
-
-        return match (strlen($lang)) {
-            2 => $lang . '_' . $payable->getBillpayer()->getBillingAddress()->getCountryCode(),
-            5 => $lang,
-            default => null,
-        };
-    }
-
-    private function guessAppLocale(Payment $payment): ?string
-    {
-        if (!is_string($lang = App::currentLocale())) {
-            return null;
-        }
-
-        return match (strlen($lang)) {
-            2 => $lang . '_' . $payment->getPayable()->getBillpayer()->getBillingAddress()->getCountryCode(),
-            5 => $lang,
-            default => null,
-        };
-    }
-
-    private function isSupportedLocale(string $locale): bool
-    {
-        return in_array($locale, self::SUPPORTED_LOCALES);
-    }
-
-    private function looksLikeALocale(string $locale): bool
-    {
-        return
-            5 === strlen($locale) &&
-            preg_match('/[a-zA-Z][a-zA-Z]_[a-zA-Z][a-zA-Z]/', $locale);
     }
 }
