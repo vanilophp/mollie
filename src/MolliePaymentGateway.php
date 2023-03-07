@@ -9,7 +9,6 @@ use Vanilo\Contracts\Address;
 use Vanilo\Mollie\Concerns\GetsCreatedWithConfiguration;
 use Vanilo\Mollie\Factories\RequestFactory;
 use Vanilo\Mollie\Factories\ResponseFactory;
-use Vanilo\Mollie\Messages\MolliePaymentResponse;
 use Vanilo\Payment\Contracts\Payment;
 use Vanilo\Payment\Contracts\PaymentGateway;
 use Vanilo\Payment\Contracts\PaymentRequest;
