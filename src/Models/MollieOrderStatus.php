@@ -6,7 +6,7 @@ namespace Vanilo\Mollie\Models;
 
 use Konekt\Enum\Enum;
 
-class MollieStatus extends Enum
+class MollieOrderStatus extends Enum
 {
     /**
      * The order has just been created.
@@ -53,4 +53,16 @@ class MollieStatus extends Enum
      * @deprecated 2018-11-27
      */
     public const STATUS_REFUNDED = "refunded";
+
+    protected static array $labels = [
+        self::STATUS_CREATED => "Created",
+        self::STATUS_PAID => "Paid",
+        self::STATUS_AUTHORIZED => "Authorized",
+        self::STATUS_CANCELED => "Canceled",
+        self::STATUS_SHIPPING => "Shipping",
+        self::STATUS_COMPLETED => "Completed",
+        self::STATUS_EXPIRED => "Expired",
+        self::STATUS_PENDING => "Pending",
+        self::STATUS_REFUNDED => "Refunded",
+    ];
 }

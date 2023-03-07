@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Vanilo\Mollie\Utils;
 
 use Illuminate\Support\Facades\App;
-use Vanilo\Payment\Contracts\Payment;
+use Vanilo\Contracts\Payable;
 
 final class LocaleResolver
 {
@@ -26,18 +26,18 @@ final class LocaleResolver
 
     private static ?self $instance = null;
 
-    public static function makeAnEducatedGuess(Payment $payment): string
+    public static function makeAnEducatedGuess(Payable $payable): string
     {
         $instance = self::$instance ?: (self::$instance = new self());
 
-        $locale = $instance->guessPaymentLocale($payment);
+        $locale = $instance->guessPayableLocale($payable);
         if (!is_null($locale)) {
             if ($instance->isSupportedLocale($locale) || $instance->looksLikeALocale($locale)) {
                 return $locale;
             }
         }
 
-        $locale = $instance->guessAppLocale($payment);
+        $locale = $instance->guessAppLocale($payable);
         if (!is_null($locale)) {
             if ($instance->isSupportedLocale($locale) || $instance->looksLikeALocale($locale)) {
                 return $locale;
@@ -47,9 +47,8 @@ final class LocaleResolver
         return 'en_US';
     }
 
-    private function guessPaymentLocale(Payment $payment): ?string
+    private function guessPayableLocale(Payable $payable): ?string
     {
-        $payable = $payment->getPayable();
         if (!method_exists($payable, 'getLanguage')) {
             return null;
         }
@@ -65,14 +64,14 @@ final class LocaleResolver
         };
     }
 
-    private function guessAppLocale(Payment $payment): ?string
+    private function guessAppLocale(Payable $payable): ?string
     {
         if (!is_string($lang = App::currentLocale())) {
             return null;
         }
 
         return match (strlen($lang)) {
-            2 => $lang . '_' . $payment->getPayable()->getBillpayer()->getBillingAddress()->getCountryCode(),
+            2 => $lang . '_' . $payable->getBillpayer()->getBillingAddress()->getCountryCode(),
             5 => $lang,
             default => null,
         };

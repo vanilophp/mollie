@@ -14,7 +14,8 @@ declare(strict_types=1);
 
 namespace Vanilo\Mollie\Factories;
 
-use Vanilo\Mollie\Concerns\HasApiKeyConstructor;
+use Vanilo\Mollie\Concerns\FormatsPriceForApi;
+use Vanilo\Mollie\Concerns\GetsCreatedWithConfiguration;
 use Vanilo\Mollie\Messages\MolliePaymentRequest;
 use Vanilo\Payment\Contracts\Payment;
 use Vanilo\Payment\Support\ReplacesPaymentUrlParameters;
@@ -22,27 +23,42 @@ use Vanilo\Payment\Support\ReplacesPaymentUrlParameters;
 final class RequestFactory
 {
     use ReplacesPaymentUrlParameters;
-    use HasApiKeyConstructor;
+    use GetsCreatedWithConfiguration;
+    use FormatsPriceForApi;
 
-    public function create(Payment $payment, ?string $redirectUrl, ?string $webhookUrl, ?string $view): MolliePaymentRequest
+    private ?OrderFactory $_orderFactory = null;
+
+    public function create(Payment $payment, ?string $subtype, ?string $redirectUrl, ?string $webhookUrl, ?string $view): MolliePaymentRequest
     {
-        $paymentRequest = new MolliePaymentRequest(
-            $this->apiKey,
-            $this->url($payment, 'redirect', $redirectUrl),
-            $this->url($payment, 'webhook', $webhookUrl),
-        );
+        $mollieOrder = $this->orderFactory()
+            ->createForPayment(
+                $payment,
+                $this->url($payment, 'webhook', $webhookUrl),
+                $this->url($payment, 'redirect', $redirectUrl),
+            );
+
+        $paymentRequest = new MolliePaymentRequest($mollieOrder->payments()[0]);
 
         if (null !== $view) {
             $paymentRequest->setView($view);
         }
 
-        return $paymentRequest->create($payment);
+        return $paymentRequest;
     }
 
-    private function url(Payment $payment, string $which, ?string $forceUrl): ?string
+    private function orderFactory(): OrderFactory
+    {
+        if (null === $this->_orderFactory) {
+            $this->_orderFactory = new OrderFactory($this->configuration);
+        }
+
+        return $this->_orderFactory;
+    }
+
+    private function url(Payment $payment, string $which, ?string $forceUrl = null): ?string
     {
         $prop = $which . 'Url';
-        $url = $forceUrl ?? $this->{$prop};
+        $url = $forceUrl ?? $this->configuration->{$prop};
 
         if (null !== $url) {
             $url = $this->replaceUrlParameters($url, $payment);

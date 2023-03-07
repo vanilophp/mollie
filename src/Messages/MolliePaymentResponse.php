@@ -5,40 +5,43 @@ declare(strict_types=1);
 namespace Vanilo\Mollie\Messages;
 
 use Konekt\Enum\Enum;
-use Vanilo\Mollie\Concerns\HasApiKeyConstructor;
-use Vanilo\Mollie\Concerns\InteractsWithMollieApi;
-use Vanilo\Mollie\Models\MollieStatus;
+use Mollie\Api\Resources\Order;
+use Vanilo\Mollie\Models\MollieOrderStatus;
 use Vanilo\Payment\Contracts\PaymentResponse;
 use Vanilo\Payment\Contracts\PaymentStatus;
 use Vanilo\Payment\Models\PaymentStatusProxy;
 
-class MolliePaymentResponse implements PaymentResponse
+/**
+ * @see https://docs.mollie.com/orders/status-changes
+ */
+final class MolliePaymentResponse implements PaymentResponse
 {
-    use InteractsWithMollieApi;
-    use HasApiKeyConstructor;
-
     private string $paymentId;
 
-    private ?float $amountPaid;
+    private float $totalAmountOfOrder;
 
-    private MollieStatus $nativeStatus;
+    private float $totalAmountCaptured;
+
+    private float $totalAmountRefunded;
+
+    private MollieOrderStatus $nativeStatus;
 
     private ?PaymentStatus $status = null;
 
-    private string $message;
-
     private ?string $transactionId;
 
-    public function process(string $remoteId): self
+    public static function createFromOrder(Order $order): self
     {
-        $order = $this->mollie()->orders->get($remoteId);
+        $result = new self();
 
-        $this->nativeStatus = new MollieStatus($order->status);
-        $this->transactionId = $order->id;
-        $this->amountPaid = (float) $order->amount->value;
-        $this->paymentId = $order->metadata->payment_id;
+        $result->nativeStatus = new MollieOrderStatus($order->status);
+        $result->transactionId = $order->id;
+        $result->totalAmountOfOrder = (float) $order->amount->value;
+        $result->totalAmountCaptured = (float) $order->amountCaptured->value;
+        $result->totalAmountRefunded = (float) $order->amountRefunded->value;
+        $result->paymentId = $order->metadata->payment_id;
 
-        return $this;
+        return $result;
     }
 
     public function wasSuccessful(): bool
@@ -58,9 +61,18 @@ class MolliePaymentResponse implements PaymentResponse
 
     public function getAmountPaid(): ?float
     {
-        // Make sure to return a negative amount if the transaction
-        // the response represents was a refund, partial refund cancellation or similar etc
-        return $this->amountPaid;
+        return match ($this->getNativeStatus()->value()) {
+            MollieOrderStatus::STATUS_CREATED => 0,
+            MollieOrderStatus::STATUS_PENDING => 0,
+            MollieOrderStatus::STATUS_AUTHORIZED => $this->totalAmountOfOrder, // @todo Compare with previous status
+            MollieOrderStatus::STATUS_CANCELED => -1 * $this->totalAmountOfOrder, //@todo Compare with existing order status and existing refunds
+            MollieOrderStatus::STATUS_EXPIRED => 0,
+            MollieOrderStatus::STATUS_PAID => $this->totalAmountCaptured, // @todo check previous status
+            MollieOrderStatus::STATUS_SHIPPING => 0,
+            MollieOrderStatus::STATUS_COMPLETED => 0,
+            MollieOrderStatus::STATUS_REFUNDED => -1 * $this->totalAmountRefunded,
+            default => 0,
+        };
     }
 
     public function getPaymentId(): string
@@ -73,15 +85,15 @@ class MolliePaymentResponse implements PaymentResponse
         if (null === $this->status) {
             /** @see https://docs.mollie.com/orders/status-changes */
             $this->status = match ($this->getNativeStatus()->value()) {
-                MollieStatus::STATUS_CREATED => PaymentStatusProxy::PENDING(),
-                MollieStatus::STATUS_PENDING => PaymentStatusProxy::ON_HOLD(),
-                MollieStatus::STATUS_AUTHORIZED => PaymentStatusProxy::AUTHORIZED(),
-                MollieStatus::STATUS_CANCELED => PaymentStatusProxy::CANCELLED(),
-                MollieStatus::STATUS_EXPIRED => PaymentStatusProxy::TIMEOUT(),
-                MollieStatus::STATUS_PAID => PaymentStatusProxy::PAID(),
-                MollieStatus::STATUS_SHIPPING => PaymentStatusProxy::PAID(),
-                MollieStatus::STATUS_COMPLETED => PaymentStatusProxy::PAID(),
-                MollieStatus::STATUS_REFUNDED => PaymentStatusProxy::REFUNDED(),
+                MollieOrderStatus::STATUS_CREATED => PaymentStatusProxy::PENDING(),
+                MollieOrderStatus::STATUS_PENDING => PaymentStatusProxy::ON_HOLD(),
+                MollieOrderStatus::STATUS_AUTHORIZED => PaymentStatusProxy::AUTHORIZED(),
+                MollieOrderStatus::STATUS_CANCELED => PaymentStatusProxy::CANCELLED(),
+                MollieOrderStatus::STATUS_EXPIRED => PaymentStatusProxy::TIMEOUT(),
+                MollieOrderStatus::STATUS_PAID => PaymentStatusProxy::PAID(),
+                MollieOrderStatus::STATUS_SHIPPING => PaymentStatusProxy::PAID(),
+                MollieOrderStatus::STATUS_COMPLETED => PaymentStatusProxy::PAID(),
+                MollieOrderStatus::STATUS_REFUNDED => PaymentStatusProxy::REFUNDED(),
                 default => PaymentStatusProxy::ON_HOLD(),// Shouldn't happen, but it worth checking
             };
         }
