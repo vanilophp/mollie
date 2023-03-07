@@ -37,8 +37,8 @@ final class MolliePaymentResponse implements PaymentResponse
         $result->nativeStatus = new MollieOrderStatus($order->status);
         $result->transactionId = $order->id;
         $result->totalAmountOfOrder = (float) $order->amount->value;
-        $result->totalAmountCaptured = (float) $order->amountCaptured->value;
-        $result->totalAmountRefunded = (float) $order->amountRefunded->value;
+        $result->totalAmountCaptured = (float) $order->amountCaptured?->value;
+        $result->totalAmountRefunded = (float) $order->amountRefunded?->value;
         $result->paymentId = $order->metadata->payment_id;
 
         return $result;
