@@ -10,8 +10,8 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        php: ['8.2']
-        laravel: ['10.0', '10.12']
+        php: ['8.2', '8.3']
+        laravel: ['10.0', '10.37']
     name: PHP ${{ matrix.php }} Laravel ${{ matrix.laravel }}
     steps:
       - name: Checkout
@@ -23,7 +23,7 @@ jobs:
           extensions: mbstring, json, sqlite3
           tools: composer:v2
       - name: Lock Laravel Version
-        run: composer require "laravel/framework:${{ matrix.laravel }}.*" --no-update -v && composer require "laravel/framework:${{ matrix.laravel }}.*" --no-update -v
+        run: composer require "laravel/framework:${{ matrix.laravel }}.*" --no-update -v
       - name: Composer Install
         run: composer install --prefer-dist --no-progress --no-interaction
       - name: Create Database
