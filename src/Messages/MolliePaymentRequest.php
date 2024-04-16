@@ -39,4 +39,9 @@ class MolliePaymentRequest implements PaymentRequest
 
         return $this;
     }
+
+    public function getRemoteId(): ?string
+    {
+        return $this->molliePayment->id;
+    }
 }

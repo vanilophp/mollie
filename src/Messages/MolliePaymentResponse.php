@@ -59,6 +59,11 @@ final class MolliePaymentResponse implements PaymentResponse
         return $this->transactionId;
     }
 
+    public function getTransactionAmount(): float
+    {
+        return $this->getAmountPaid() ?? 0;
+    }
+
     public function getAmountPaid(): ?float
     {
         return match ($this->getNativeStatus()->value()) {

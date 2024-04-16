@@ -4,6 +4,7 @@
 #### 2023-XX-YY
 
 - Added Vanilo 4 Compatibility
+- Added Laravel 11 support
 - Dropped Vanilo 3, Laravel 9 and PHP 8.1 support
 
 ## 1.1.0
