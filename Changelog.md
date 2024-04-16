@@ -5,6 +5,7 @@
 
 - Added Vanilo 4 Compatibility
 - Added Laravel 11 support
+- Changed minimum Laravel requirement to v10.43
 - Dropped Vanilo 3, Laravel 9 and PHP 8.1 support
 
 ## 1.1.0
