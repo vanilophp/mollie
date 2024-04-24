@@ -13,6 +13,7 @@ use Vanilo\Payment\Contracts\Payment;
 use Vanilo\Payment\Contracts\PaymentGateway;
 use Vanilo\Payment\Contracts\PaymentRequest;
 use Vanilo\Payment\Contracts\PaymentResponse;
+use Vanilo\Payment\Contracts\TransactionHandler;
 
 class MolliePaymentGateway implements PaymentGateway
 {
@@ -43,6 +44,11 @@ class MolliePaymentGateway implements PaymentGateway
     public function processPaymentResponse(Request $request, array $options = []): PaymentResponse
     {
         return $this->responseFactory()->create($request->input('id'));
+    }
+
+    public function transactionHandler(): ?TransactionHandler
+    {
+        return null;
     }
 
     public function isOffline(): bool
