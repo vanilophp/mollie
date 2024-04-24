@@ -21,6 +21,8 @@ class MolliePaymentGateway implements PaymentGateway
 
     public const DEFAULT_ID = 'mollie';
 
+    private static ?string $svg = null;
+
     private ?RequestFactory $requestFactory = null;
 
     private ?ResponseFactory $responseFactory = null;
@@ -28,6 +30,11 @@ class MolliePaymentGateway implements PaymentGateway
     public static function getName(): string
     {
         return 'Mollie';
+    }
+
+    public static function svgIcon(): string
+    {
+        return self::$svg ??= file_get_contents(__DIR__ . '/../../resources/logo.svg');
     }
 
     public function createPaymentRequest(Payment $payment, Address $shippingAddress = null, array $options = []): PaymentRequest
