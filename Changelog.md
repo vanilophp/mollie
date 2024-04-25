@@ -1,7 +1,7 @@
 # Mollie for Vanilo Changelog
 
-## Unreleased
-#### 2023-XX-YY
+## 2.0.0
+#### 2024-04-25
 
 - Added Vanilo 4 Compatibility
 - Added Laravel 11 support
