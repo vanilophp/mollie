@@ -5,7 +5,9 @@
 The following `.env` parameters can be set in order to work with this package.
 
 ```dotenv
-MOLLIE_Mollie=
+MOLLIE_API_KEY=
+MOLLIE_RETURN_URL=
+MOLLIE_WEBHOOK_URL=
 ```
 
 ## Registration with Payments Module

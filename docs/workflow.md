@@ -4,7 +4,7 @@ The typical Vanilo Payments workflow with Mollie
 consists of the following steps:
 
 1. Create an **Order** (or any
-   ["Payable"](https://vanilo.io/docs/2.x/payments#payables))
+   ["Payable"](https://vanilo.io/docs/4.x/payments#payables))
 2. Obtain the **payment method** from the checkout<sup>*</sup>
 3. Get the appropriate **gateway instance** associated with the payment
    method
@@ -118,7 +118,7 @@ $gateway->createPaymentRequest($payment, null, $options);
 
 Apart from passing the `view` option to the `createPaymentRequest` (see
 above), there's an even more simple way: Laravel lets you
-[override the views from vendor packages](https://laravel.com/docs/8.x/packages#overriding-package-views)
+[override the views from vendor packages](https://laravel.com/docs/11.x/packages#overriding-package-views)
 like this.
 
 Simply put, if you create the

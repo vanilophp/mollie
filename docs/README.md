@@ -1,7 +1,7 @@
 # Vanilo Mollie Documentation
 
 This library implements the Mollie integration for
-[Vanilo Payments](https://vanilo.io/docs/master/payments).
+[Vanilo Payments](https://vanilo.io/docs/4.x/payments).
 
 ---
 
