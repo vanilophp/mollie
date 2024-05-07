@@ -1,7 +1,7 @@
 # Mollie for Vanilo Changelog
 
-## Unreleased
-#### 2024-XX-YY
+## 2.1.0
+#### 2024-05-07
 
 - Added the propaganistas/laravel-phone package dependency
 - Added automatic conversion of billpayer phone numbers to E.164 format when crafting the create mollie order request
