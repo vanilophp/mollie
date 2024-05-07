@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Vanilo\Mollie\Factories;
 
 use Mollie\Api\Resources\Order;
+use Propaganistas\LaravelPhone\PhoneNumber;
 use Vanilo\Contracts\Payable;
 use Vanilo\Mollie\Concerns\ConstructsApiClientFromConfiguration;
 use Vanilo\Mollie\Concerns\FormatsPriceForApi;
@@ -44,7 +45,7 @@ final class OrderFactory
                 'givenName' => $billPayer->getFirstName(),
                 'familyName' => $billPayer->getLastName(),
                 'email' => $billPayer->getEmail(),
-                'phone' => $billPayer->getPhone(),
+                'phone' => (new PhoneNumber($billPayer->getPhone(), $billPayer->getBillingAddress()->getCountryCode()))->formatE164(),
                 'organizationName' => $billPayer->getCompanyName(),
                 'streetAndNumber' => $billPayer->getBillingAddress()->getAddress(),
                 'postalCode' => $billPayer->getBillingAddress()->getPostalCode(),
