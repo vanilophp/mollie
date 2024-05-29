@@ -1,7 +1,7 @@
 # Mollie for Vanilo Changelog
 
-## Unreleased
-#### 2024-XX-YY
+## 2.1.1
+#### 2024-05-29
 
 - Fix possible error at order creation by not sending the phone number to Mollie when it's not present
 
