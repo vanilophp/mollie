@@ -31,10 +31,9 @@ final class OrderFactory
     {
         $payable = $payment->getPayable();
         $billPayer = $payable->getBillpayer();
-
         $paymentSpecificParameters = $subtype ? ['method' => $subtype] : [];
 
-        $order = $this->apiClient->orders->create([
+        $payload = [
             'amount' => [
                 'currency' => $payable->getCurrency(),
                 'value' => $this->formatPrice($payable->getAmount()),
@@ -45,7 +44,6 @@ final class OrderFactory
                 'givenName' => $billPayer->getFirstName(),
                 'familyName' => $billPayer->getLastName(),
                 'email' => $billPayer->getEmail(),
-                'phone' => (new PhoneNumber($billPayer->getPhone(), $billPayer->getBillingAddress()->getCountryCode()))->formatE164(),
                 'organizationName' => $billPayer->getCompanyName(),
                 'streetAndNumber' => $billPayer->getBillingAddress()->getAddress(),
                 'postalCode' => $billPayer->getBillingAddress()->getPostalCode(),
@@ -59,7 +57,13 @@ final class OrderFactory
             'metadata' => [
                 'payment_id' => $payment->getPaymentId(),
             ],
-        ], ['embed' => 'payments']);
+        ];
+
+        if (!empty($billPayer->getPhone())) {
+            $payload['billingAddress']['phone'] = (new PhoneNumber($billPayer->getPhone(), $billPayer->getBillingAddress()->getCountryCode()))->formatE164();
+        }
+
+        $order = $this->apiClient->orders->create($payload, ['embed' => 'payments']);
 
         return $order;
     }
