@@ -81,11 +81,11 @@ final class OrderFactory
                     'sku' => $item->product->sku,
                     'unitPrice' => [
                         'currency' => $currency,
-                        'value' => $this->formatPrice($item->product->price),
+                        'value' => $this->formatPrice($item->price),
                     ],
                     'totalAmount' => [
                         'currency' => $currency,
-                        'value' => $this->formatPrice($item->total),
+                        'value' => $this->formatPrice($item->total()),
                     ],
                     'vatRate' => 0,
                     'vatAmount' => [

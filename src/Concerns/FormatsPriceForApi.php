@@ -18,6 +18,6 @@ trait FormatsPriceForApi
 {
     private function formatPrice($price): string
     {
-        return number_format($price, 2, '.', '');
+        return number_format((float) $price, 2, '.', '');
     }
 }
