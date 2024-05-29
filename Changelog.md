@@ -1,7 +1,7 @@
 # Mollie for Vanilo Changelog
 
-## Unreleased
-#### 2024-XX-YY
+## 2.1.2
+#### 2024-05-29
 
 - Fixed price-related errors at Mollie order creation
 
