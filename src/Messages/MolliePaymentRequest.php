@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Vanilo\Mollie\Messages;
 
 use Illuminate\Support\Facades\View;
-use Mollie\Api\Resources\Payment;
+use Mollie\Api\Resources\Order;
 use Vanilo\Payment\Contracts\PaymentRequest;
 
 class MolliePaymentRequest implements PaymentRequest
@@ -13,7 +13,7 @@ class MolliePaymentRequest implements PaymentRequest
     private string $view = 'mollie::_request';
 
     public function __construct(
-        private Payment $molliePayment
+        private Order $mollieOrder
     ) {
     }
 
@@ -22,7 +22,7 @@ class MolliePaymentRequest implements PaymentRequest
         return View::make(
             $this->view,
             [
-                'url' => $this->molliePayment->getCheckoutUrl(),
+                'url' => $this->mollieOrder->getCheckoutUrl(),
                 'autoRedirect' => $options['autoRedirect'] ?? false,
             ]
         )->render();
@@ -42,6 +42,6 @@ class MolliePaymentRequest implements PaymentRequest
 
     public function getRemoteId(): ?string
     {
-        return $this->molliePayment->id;
+        return $this->mollieOrder->id;
     }
 }

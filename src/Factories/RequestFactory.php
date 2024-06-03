@@ -37,7 +37,7 @@ final class RequestFactory
                 $this->url($payment, 'redirect', $redirectUrl),
             );
 
-        $paymentRequest = new MolliePaymentRequest($mollieOrder->payments()[0]);
+        $paymentRequest = new MolliePaymentRequest($mollieOrder);
 
         if (null !== $view) {
             $paymentRequest->setView($view);

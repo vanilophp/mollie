@@ -1,5 +1,10 @@
 # Mollie for Vanilo Changelog
 
+## Unreleased
+#### 2024-XX-YY
+
+- Changed the payment request to return the mollie order id as payable remote id instead of the transaction id
+
 ## 2.1.2
 #### 2024-05-29
 
