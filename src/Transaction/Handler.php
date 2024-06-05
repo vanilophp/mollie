@@ -47,7 +47,7 @@ class Handler implements TransactionHandler
             return false;
         }
 
-        if (! ($order->isPaid() || $order->isAuthorized() || $order->isCompleted())) {
+        if (!($order->isPaid() || $order->isAuthorized() || $order->isCompleted())) {
             return false;
         }
 
