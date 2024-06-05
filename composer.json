@@ -14,9 +14,9 @@
     "require": {
         "php": "^8.2",
         "konekt/concord": "^1.13",
-        "vanilo/payment": "^4.0",
-        "vanilo/contracts": "^4.0",
-        "mollie/mollie-api-php": "^2.0",
+        "vanilo/payment": "^4.1",
+        "vanilo/contracts": "^4.1",
+        "mollie/mollie-api-php": "^2.54",
         "propaganistas/laravel-phone": "^5.3"
     },
     "autoload": {

@@ -20,7 +20,7 @@ class MolliePaymentRequest implements PaymentRequest
     public function getHtmlSnippet(array $options = []): ?string
     {
         return View::make(
-            $this->view,
+            $options['view'] ?? $this->view,
             [
                 'url' => $this->mollieOrder->getCheckoutUrl(),
                 'autoRedirect' => $options['autoRedirect'] ?? false,

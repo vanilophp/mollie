@@ -9,6 +9,7 @@ use Vanilo\Contracts\Address;
 use Vanilo\Mollie\Concerns\GetsCreatedWithConfiguration;
 use Vanilo\Mollie\Factories\RequestFactory;
 use Vanilo\Mollie\Factories\ResponseFactory;
+use Vanilo\Mollie\Transaction\Handler;
 use Vanilo\Payment\Contracts\Payment;
 use Vanilo\Payment\Contracts\PaymentGateway;
 use Vanilo\Payment\Contracts\PaymentRequest;
@@ -26,6 +27,8 @@ class MolliePaymentGateway implements PaymentGateway
     private ?RequestFactory $requestFactory = null;
 
     private ?ResponseFactory $responseFactory = null;
+
+    private ?Handler $transactionHandler = null;
 
     public static function getName(): string
     {
@@ -55,7 +58,11 @@ class MolliePaymentGateway implements PaymentGateway
 
     public function transactionHandler(): ?TransactionHandler
     {
-        return null;
+        if (null === $this->transactionHandler) {
+            $this->transactionHandler = new Handler($this->configuration);
+        }
+
+        return $this->transactionHandler;
     }
 
     public function isOffline(): bool

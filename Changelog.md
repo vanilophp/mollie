@@ -1,5 +1,13 @@
 # Mollie for Vanilo Changelog
 
+## Unreleased
+
+- Changed minimum Vanilo version to v4.1
+- Changed minimum Mollie PHP SDK version to v2.54
+- Added the (experimental) `TransactionHandler` class
+- Added refund and retry payment features (via the TransactionHandler class)
+- Added the `view` option to the payment request's html snippet method
+
 ## 2.2.0
 #### 2024-06-03
 

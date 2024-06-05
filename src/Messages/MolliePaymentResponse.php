@@ -46,7 +46,11 @@ final class MolliePaymentResponse implements PaymentResponse
 
     public function wasSuccessful(): bool
     {
-        return $this->getStatus()->isPending() || $this->getStatus()->isAuthorized() || $this->getStatus()->isPaid();
+        return $this->getStatus()->isAnyOf(
+            PaymentStatusProxy::PENDING(),
+            PaymentStatusProxy::AUTHORIZED(),
+            PaymentStatusProxy::PAID(),
+        );
     }
 
     public function getMessage(): string
@@ -99,7 +103,7 @@ final class MolliePaymentResponse implements PaymentResponse
                 MollieOrderStatus::STATUS_SHIPPING => PaymentStatusProxy::PAID(),
                 MollieOrderStatus::STATUS_COMPLETED => PaymentStatusProxy::PAID(),
                 MollieOrderStatus::STATUS_REFUNDED => PaymentStatusProxy::REFUNDED(),
-                default => PaymentStatusProxy::ON_HOLD(),// Shouldn't happen, but it worth checking
+                default => PaymentStatusProxy::ON_HOLD(),// Shouldn't happen, but its worth checking
             };
         }
 
