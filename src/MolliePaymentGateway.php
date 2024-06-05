@@ -53,6 +53,17 @@ class MolliePaymentGateway implements PaymentGateway
 
     public function processPaymentResponse(Request $request, array $options = []): PaymentResponse
     {
+        /**
+         * @see https://docs.mollie.com/overview/webhooks
+         * @see https://docs.mollie.com/orders/status-changes
+         * This method has to receive the request coming from a Mollie Order Webhook call
+         * Mollie calls the webhooks for the following order states:
+         * - paid
+         * - authorized
+         * - completed
+         * - canceled
+         * - expired
+         */
         return $this->responseFactory()->create($request->input('id'));
     }
 

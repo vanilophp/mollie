@@ -63,7 +63,7 @@ class Handler implements TransactionHandler
     {
         $order = $this->getOrder($payment);
 
-        return $order->isCreated() || $order->isPending();
+        return $order && ($order->isCreated() || $order->isPending());
     }
 
     public function getRetryRequest(Payment $payment, array $options = []): PaymentRequest|TransactionNotCreated
@@ -80,7 +80,7 @@ class Handler implements TransactionHandler
         $id = $payment->getPaymentId();
         if (!isset($this->orders[$id])) {
             try {
-                $this->orders[$id] = $this->apiClient->orders->get($payment->getRemoteId());
+                $this->orders[$id] = $this->apiClient->orders->get($payment->getPayable()->getPayableRemoteId());
             } catch (\Exception $e) {
                 $this->orders[$id] = null;
             }
