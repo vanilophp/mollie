@@ -1,7 +1,7 @@
 # Mollie for Vanilo Changelog
 
-## Unreleased
-#### 2024-XX-YY
+## 2.3.1
+#### 2024-08-27
 
 - Fixed the possible sending of invalid locale to Mollie at order creation
 
