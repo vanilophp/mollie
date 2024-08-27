@@ -31,17 +31,13 @@ final class LocaleResolver
         $instance = self::$instance ?: (self::$instance = new self());
 
         $locale = $instance->guessPayableLocale($payable);
-        if (!is_null($locale)) {
-            if ($instance->isSupportedLocale($locale) || $instance->looksLikeALocale($locale)) {
-                return $locale;
-            }
+        if (null !== $locale && $instance->isSupportedLocale($locale)) {
+            return $locale;
         }
 
         $locale = $instance->guessAppLocale($payable);
-        if (!is_null($locale)) {
-            if ($instance->isSupportedLocale($locale) || $instance->looksLikeALocale($locale)) {
-                return $locale;
-            }
+        if (null !== $locale && $instance->isSupportedLocale($locale)) {
+            return $locale;
         }
 
         return 'en_US';
@@ -80,12 +76,5 @@ final class LocaleResolver
     private function isSupportedLocale(string $locale): bool
     {
         return in_array($locale, self::SUPPORTED_LOCALES);
-    }
-
-    private function looksLikeALocale(string $locale): bool
-    {
-        return
-            5 === strlen($locale) &&
-            preg_match('/[a-zA-Z][a-zA-Z]_[a-zA-Z][a-zA-Z]/', $locale);
     }
 }
