@@ -40,7 +40,7 @@ class MolliePaymentGateway implements PaymentGateway
         return self::$svg ??= file_get_contents(__DIR__ . '/resources/logo.svg');
     }
 
-    public function createPaymentRequest(Payment $payment, Address $shippingAddress = null, array $options = []): PaymentRequest
+    public function createPaymentRequest(Payment $payment, ?Address $shippingAddress = null, array $options = []): PaymentRequest
     {
         return $this->requestFactory()->create(
             $payment,
