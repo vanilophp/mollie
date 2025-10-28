@@ -1,5 +1,10 @@
 # Mollie for Vanilo Changelog
 
+## Unreleased
+#### 2025-XX-YY
+
+- Added discounts to Mollie order items when they are present on the source order
+
 ## 3.0.0
 #### 2025-09-19
 

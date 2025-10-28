@@ -14,11 +14,14 @@ declare(strict_types=1);
 
 namespace Vanilo\Mollie\Factories;
 
+use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
 use Propaganistas\LaravelPhone\PhoneNumber;
+use Vanilo\Adjustments\Contracts\AdjustmentCollection;
 use Vanilo\Contracts\Payable;
 use Vanilo\Mollie\Concerns\ConstructsApiClientFromConfiguration;
 use Vanilo\Mollie\Concerns\FormatsPriceForApi;
+use Vanilo\Mollie\Tests\Fakes\FakeMollieHttpAdapter;
 use Vanilo\Mollie\Utils\LocaleResolver;
 use Vanilo\Payment\Contracts\Payment;
 
@@ -63,9 +66,15 @@ final class OrderFactory
             $payload['billingAddress']['phone'] = (new PhoneNumber($billPayer->getPhone(), $billPayer->getBillingAddress()->getCountryCode()))->formatE164();
         }
 
-        $order = $this->apiClient->orders->create($payload, ['embed' => 'payments']);
+        return $this->apiClient->orders->create($payload, ['embed' => 'payments']);
+    }
 
-        return $order;
+    public function fake(?FakeMollieHttpAdapter $adapter = null): self
+    {
+        $this->apiClient = new MollieApiClient($adapter ?? new FakeMollieHttpAdapter());
+        $this->apiClient->setApiKey($this->configuration->apiKey);
+
+        return $this;
     }
 
     private function prepareOrderLines(Payable $payable): array
@@ -73,8 +82,12 @@ final class OrderFactory
         $currency = $payable->getCurrency();
 
         $result = [];
-        if (method_exists($payable, 'getItems')) {
+        if ($payable->hasItems() || dd($payable)) {
             $result = $payable->getItems()->map(function ($item) use ($currency) {
+                $discount = match (method_exists($item, 'adjustments')) {
+                    true => $item->adjustments()->byType(\Vanilo\Adjustments\Models\AdjustmentType::create('promotion'))->total(),
+                    default => 0,
+                };
                 return [
                     'name' => $item->name,
                     'quantity' => $item->quantity,
@@ -86,6 +99,10 @@ final class OrderFactory
                     'totalAmount' => [
                         'currency' => $currency,
                         'value' => $this->formatPrice($item->total()),
+                    ],
+                    'discountAmount' => [
+                        'currency' => $currency,
+                        'value' => $this->formatPrice($discount),
                     ],
                     'vatRate' => 0,
                     'vatAmount' => [
@@ -111,10 +128,7 @@ final class OrderFactory
     {
         $result = [];
 
-        if (method_exists($payable, 'adjustments') &&
-            interface_exists('\Vanilo\Adjustments\Contracts\AdjustmentCollection') &&
-            ($adjustments = $payable->adjustments()) instanceof \Vanilo\Adjustments\Contracts\AdjustmentCollection
-        ) {
+        if ($adjustments = $this->getAdjustmentsOrFalse($payable)) {
             foreach ($adjustments as $adjustment) {
                 if (!$adjustment->isIncluded() && 0.0 !== $adjustment->getAmount()) {
                     $result[] = [
@@ -163,5 +177,16 @@ final class OrderFactory
                 "value" => "0.00",
             ],
         ];
+    }
+
+    private function getAdjustmentsOrFalse(object $subject): false|AdjustmentCollection
+    {
+        if (!method_exists($subject, 'adjustments') || !interface_exists(AdjustmentCollection::class)) {
+            return false;
+        }
+
+        $adjustments = $subject->adjustments();
+
+        return $adjustments instanceof AdjustmentCollection ? $adjustments : false;
     }
 }
