@@ -82,10 +82,10 @@ final class OrderFactory
         $currency = $payable->getCurrency();
 
         $result = [];
-        if ($payable->hasItems() || dd($payable)) {
+        if ($payable->hasItems()) {
             $result = $payable->getItems()->map(function ($item) use ($currency) {
                 $discount = match (method_exists($item, 'adjustments')) {
-                    true => $item->adjustments()->byType(\Vanilo\Adjustments\Models\AdjustmentType::create('promotion'))->total(),
+                    true => -1 * $item->adjustments()->byType(\Vanilo\Adjustments\Models\AdjustmentType::create('promotion'))->total(),
                     default => 0,
                 };
                 return [
