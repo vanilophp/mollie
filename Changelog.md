@@ -4,6 +4,8 @@
 #### 2025-XX-YY
 
 - Added discounts to Mollie order items when they are present on the source order
+- Changed the minimum Vanilo requirement to v5.1
+- Added PHP 8.5 support
 
 ## 3.0.0
 #### 2025-09-19

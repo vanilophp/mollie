@@ -91,7 +91,7 @@ final class OrderFactory
                 return [
                     'name' => $item->name,
                     'quantity' => $item->quantity,
-                    'sku' => $item->product->sku,
+                    'sku' => $item->product?->sku,
                     'unitPrice' => [
                         'currency' => $currency,
                         'value' => $this->formatPrice($item->price),
