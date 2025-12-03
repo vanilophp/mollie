@@ -1,7 +1,7 @@
 # Mollie for Vanilo Changelog
 
-## Unreleased
-#### 2025-XX-YY
+## 3.1.0
+#### 2025-12-03
 
 - Added discounts to Mollie order items when they are present on the source order
 - Changed the minimum Vanilo requirement to v5.1
