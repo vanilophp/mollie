@@ -5,13 +5,19 @@ declare(strict_types=1);
 namespace Vanilo\Mollie\Tests\Dummies;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Traversable;
 use Vanilo\Contracts\Billpayer;
 use Vanilo\Contracts\Payable;
 
+/**
+ * @method static Order create(array $attributes = [])
+ */
 class Order extends Model implements Payable
 {
     protected $fillable = ['amount', 'currency'];
+
+    protected $table = 'mollie_test_orders';
 
     public function getPayableId(): string
     {
@@ -40,7 +46,7 @@ class Order extends Model implements Payable
 
     public function getBillpayer(): ?Billpayer
     {
-        return null;
+        return new DummyCustomer();
     }
 
     public function getNumber(): string
@@ -65,11 +71,27 @@ class Order extends Model implements Payable
 
     public function hasItems(): bool
     {
-        return false;
+        return !empty($this->items);
     }
 
     public function getItems(): Traversable
     {
-        return collect();
+        return collect($this->items);
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(DumbOrderItem::class, 'order_id', 'id');
+    }
+
+    public function addItem(Product $product, int $qty = 1): void
+    {
+        $this->items()->create([
+            'buyable_id' => $product->getId(),
+            'buyable_type' => morph_type_of($product),
+            'quantity' => $qty,
+            'name' => $product->getName(),
+            'price' => $product->getPrice(),
+        ]);
     }
 }
