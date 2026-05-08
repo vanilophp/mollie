@@ -1,5 +1,12 @@
 # Mollie for Vanilo Changelog
 
+## Unreleased
+#### 2026-XX-YY
+
+- Upgrade to Vanilo 6
+- Dropped PHP 8.3 support
+- Dropped Laravel 10 & 11 support
+
 ## 3.2.0
 #### 2026-05-08
 
