@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Vanilo\Mollie\Tests\Gateway;
 
+use PHPUnit\Framework\Attributes\Test;
 use Vanilo\Mollie\MolliePaymentGateway;
 use Vanilo\Mollie\Tests\TestCase;
 use Vanilo\Payment\Contracts\PaymentGateway;
@@ -17,14 +18,14 @@ class RegistrationWithCustomIdTest extends TestCase
         parent::setUp();
     }
 
-    /** @test */
+    #[Test]
     public function the_gateway_id_can_be_changed_from_within_the_configuration()
     {
         $this->assertCount(2, PaymentGateways::ids());
         $this->assertContains('alternative_gw_name', PaymentGateways::ids());
     }
 
-    /** @test */
+    #[Test]
     public function the_gateway_can_be_instantiated()
     {
         $payPalGateway = PaymentGateways::make('alternative_gw_name');
