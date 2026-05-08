@@ -8,7 +8,6 @@ use Mollie\Api\Resources\Order;
 use PHPUnit\Framework\Attributes\Test;
 use Vanilo\Mollie\Configuration;
 use Vanilo\Mollie\Factories\OrderFactory;
-use Vanilo\Mollie\Tests\Dummies\DumbOrderItem;
 use Vanilo\Mollie\Tests\Dummies\Order as DummyOrder;
 use Vanilo\Mollie\Tests\Dummies\Product;
 use Vanilo\Mollie\Tests\Fakes\FakeMollieHttpAdapter;
