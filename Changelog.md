@@ -1,7 +1,7 @@
 # Mollie for Vanilo Changelog
 
-## Unreleased
-#### 2026-XX-YY
+## 3.2.0
+#### 2026-05-08
 
 - Added Laravel 13 support
 - Added Laravel-Phone v6 support
