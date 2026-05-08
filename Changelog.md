@@ -1,5 +1,10 @@
 # Mollie for Vanilo Changelog
 
+## Unreleased
+#### 2026-XX-YY
+
+- Added Laravel 13 support
+
 ## 3.1.0
 #### 2025-12-03
 
