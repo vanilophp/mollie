@@ -84,17 +84,21 @@ final class OrderFactory
         $result = [];
         if ($payable->hasItems()) {
             $result = $payable->getItems()->map(function ($item) use ($currency) {
-                $discount = match (method_exists($item, 'adjustments')) {
-                    true => -1 * $item->adjustments()->byType(\Vanilo\Adjustments\Models\AdjustmentType::create('promotion'))->total(),
-                    default => 0,
-                };
+                [$discount, $vat] = $this->obtainItemDetails($item);
+
+                if (0.0 == $vat && 0.0 == $discount) {
+                    $unitPrice = $item->price;
+                } else {
+                    $unitPrice = ($item->total() + $discount) / $item->quantity;
+                }
+                
                 return [
                     'name' => $item->name,
                     'quantity' => $item->quantity,
                     'sku' => $item->product?->sku,
                     'unitPrice' => [
                         'currency' => $currency,
-                        'value' => $this->formatPrice($item->price),
+                        'value' => $this->formatPrice($unitPrice),
                     ],
                     'totalAmount' => [
                         'currency' => $currency,
@@ -188,5 +192,26 @@ final class OrderFactory
         $adjustments = $subject->adjustments();
 
         return $adjustments instanceof AdjustmentCollection ? $adjustments : false;
+    }
+
+    /**
+     * @return array{float, float} Returns the discount & vat amount
+     */
+    private function obtainItemDetails(object $item): array
+    {
+        if (empty($adjustments = $this->getAdjustmentsOrFalse($item))) { // false is also "empty"
+            return [0.0, 0.0];
+        }
+
+        $vat = 0.0;
+        $discount = -1 * $adjustments->byType(\Vanilo\Adjustments\Models\AdjustmentType::create('promotion'))->total();
+
+        foreach ($adjustments->byType(\Vanilo\Adjustments\Models\AdjustmentType::create('tax')) as $tax) {
+            if (!$tax->isIncluded()) {
+                $vat += $tax->getAmount();
+            }
+        }
+
+        return [$discount, $vat];
     }
 }

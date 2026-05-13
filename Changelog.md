@@ -6,6 +6,7 @@
 - Upgrade to Vanilo 6
 - Dropped PHP 8.3 support
 - Dropped Laravel 10 & 11 support
+- Fixed invalid calculation with VAT adjustments causing an API error
 
 ## 3.2.0
 #### 2026-05-08
