@@ -91,7 +91,7 @@ final class OrderFactory
                 } else {
                     $unitPrice = ($item->total() + $discount) / $item->quantity;
                 }
-                
+
                 return [
                     'name' => $item->name,
                     'quantity' => $item->quantity,
