@@ -13,6 +13,7 @@
     ],
     "require": {
         "php": "^8.4",
+        "laravel/framework": "^12.61.1|^13.12",
         "konekt/concord": "^1.18",
         "vanilo/payment": "^6.0",
         "vanilo/contracts": "^6.0",
