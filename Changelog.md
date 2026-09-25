@@ -1,7 +1,7 @@
 # Mollie for Vanilo Changelog
 
-## Unreleased
-#### 2026-XX-YY
+## 4.0.0
+#### 2026-09-25
 
 - Upgrade to Vanilo 6
 - Dropped PHP 8.3 support
