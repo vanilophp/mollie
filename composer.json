@@ -13,10 +13,10 @@
     ],
     "require": {
         "php": "^8.4",
-        "laravel/framework": "^12.61.1|^13.12",
+        "laravel/framework": "^12.69|^13.30",
         "konekt/concord": "^1.18",
-        "vanilo/payment": "^6.0",
-        "vanilo/contracts": "^6.0",
+        "vanilo/payment": "^6.1",
+        "vanilo/contracts": "^6.1",
         "mollie/mollie-api-php": "^2.68",
         "propaganistas/laravel-phone": "^6.0"
     },
@@ -40,7 +40,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0.x-dev"
+            "dev-master": "4.1.x-dev"
         }
     }
 }
