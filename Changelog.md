@@ -5,6 +5,7 @@
 
 - Changed the required Vanilo version to v6.1
 - Changed the minimum Laravel versions to v12.69.0 and v13.30, respectively
+- Changed minimum Mollie PHP SDK version to v2.79.1
 
 ## 4.0.0
 #### 2026-09-25

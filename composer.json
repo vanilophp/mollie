@@ -17,7 +17,8 @@
         "konekt/concord": "^1.18",
         "vanilo/payment": "^6.1",
         "vanilo/contracts": "^6.1",
-        "mollie/mollie-api-php": "^2.68",
+        "vanilo/support": "^6.1",
+        "mollie/mollie-api-php": "^2.79.1",
         "propaganistas/laravel-phone": "^6.0"
     },
     "autoload": {
