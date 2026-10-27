@@ -47,7 +47,7 @@ class MolliePaymentRequest implements PaymentRequest, Snapshottable
     {
         $snapshot = MolliePaymentRequestSnapshot::create(
             Carbon::make($this->mollieOrder->createdAt),
-            Carbon::make(Arr::last($this->mollieOrder->payments())->expiresAt),
+            Carbon::make(Arr::last((array) $this->mollieOrder->payments())->expiresAt),
         );
 
         $snapshot->load([
