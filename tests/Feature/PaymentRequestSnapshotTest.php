@@ -25,16 +25,18 @@ class PaymentRequestSnapshotTest extends TestCase
         $request = $this->createTestGateway()->createPaymentRequest($payment);
 
         $snapshot = $request->toSnapshot();
-        $lastPayment = Arr::last(data_get($snapshot->data(), 'order._embedded.payments'));
-        $this->assertEquals(Carbon::make($lastPayment->expiresAt)->timestamp, $snapshot->validUntil()->getTimestamp());
         $this->assertInstanceOf(MolliePaymentRequestSnapshot::class, $snapshot);
         $this->assertStringStartsWith('ord_', data_get($snapshot->data(), 'order.id'));
         $this->assertEquals($request->getRemoteId(), data_get($snapshot->data(), 'order.id'));
         $this->assertEquals($payment->getAmount(), (float) data_get($snapshot->data(), 'order.amount.value'));
         $this->assertEquals($payment->getCurrency(), data_get($snapshot->data(), 'order.amount.currency'));
         $this->assertEquals(
-            $snapshot->takenAt()->format('Y-m-d H:i:s'),
-            Carbon::make(data_get($snapshot->data(), 'order.createdAt'))->format('Y-m-d H:i:s'),
+            Carbon::make(data_get($snapshot->data(), 'order.createdAt'))->getTimestamp(),
+            $snapshot->takenAt()->getTimestamp(),
+        );
+        $this->assertEquals(
+            Carbon::make(data_get($snapshot->data(), 'order.expiresAt'))->getTimestamp(),
+            $snapshot->validUntil()->getTimestamp(),
         );
 
         $restoredRequest = MolliePaymentRequest::fromSnapshot($snapshot);
