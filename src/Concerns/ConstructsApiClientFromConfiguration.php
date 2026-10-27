@@ -24,6 +24,6 @@ trait ConstructsApiClientFromConfiguration
     public function __construct(
         private Configuration $configuration
     ) {
-        $this->apiClient = (new MollieApiClient())->setApiKey($this->configuration->apiKey);
+        $this->apiClient = new MollieApiClient()->setApiKey($this->configuration->apiKey);
     }
 }

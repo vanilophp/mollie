@@ -40,7 +40,7 @@ class Order extends Model implements Payable
 
     public function getBillpayer(): ?Billpayer
     {
-        return null;
+        return new RoniRamirez();
     }
 
     public function getNumber(): string
