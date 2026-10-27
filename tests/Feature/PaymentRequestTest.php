@@ -32,7 +32,7 @@ class PaymentRequestTest extends TestCase
         $this->assertEquals($payment->getAmount(), $remoteOrder->amount->value);
         $this->assertEquals($payment->getCurrency(), $remoteOrder->amount->currency);
         $this->assertStringEndsWith($payment->getPaymentId(), $remoteOrder->metadata->payment_id);
-        $this->assertLessThan(15, Carbon::make($remoteOrder->createdAt)->diffInSeconds(absolute: true));
+        $this->assertEqualsWithDelta(Carbon::make($remoteOrder->createdAt), now(), 15);
 
         $this->assertStringContainsString($remoteOrder->getCheckoutUrl(), $request->getHtmlSnippet());
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Vanilo\Mollie\Tests\Feature;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\Test;
 use Vanilo\Mollie\Messages\MolliePaymentRequest;
@@ -24,6 +25,8 @@ class PaymentRequestSnapshotTest extends TestCase
         $request = $this->createTestGateway()->createPaymentRequest($payment);
 
         $snapshot = $request->toSnapshot();
+        $lastPayment = Arr::last(data_get($snapshot->data(), 'order._embedded.payments'));
+        $this->assertEquals(Carbon::make($lastPayment->expiresAt)->timestamp, $snapshot->validUntil()->getTimestamp());
         $this->assertInstanceOf(MolliePaymentRequestSnapshot::class, $snapshot);
         $this->assertStringStartsWith('ord_', data_get($snapshot->data(), 'order.id'));
         $this->assertEquals($request->getRemoteId(), data_get($snapshot->data(), 'order.id'));

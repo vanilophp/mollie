@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Vanilo\Mollie\Messages;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\View;
 use Mollie\Api\MollieApiClient;
@@ -46,7 +47,7 @@ class MolliePaymentRequest implements PaymentRequest, Snapshottable
     {
         $snapshot = MolliePaymentRequestSnapshot::create(
             Carbon::make($this->mollieOrder->createdAt),
-            Carbon::make($this->mollieOrder->expiresAt),
+            Carbon::make(Arr::last($this->mollieOrder->payments())->expiresAt),
         );
 
         $snapshot->load([
