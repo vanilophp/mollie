@@ -32,3 +32,5 @@ jobs:
         run: mkdir -p database && touch database/database.sqlite
       - name: Run Tests
         run: php vendor/bin/phpunit --testdox
+        env:
+          MOLLIE_API_KEY: ${{ secrets.MOLLIE_API_KEY }}
