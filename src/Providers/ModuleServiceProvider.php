@@ -6,9 +6,10 @@ namespace Vanilo\Mollie\Providers;
 
 use Konekt\Concord\BaseModuleServiceProvider;
 use Vanilo\Mollie\Configuration;
-use Vanilo\Mollie\Messages\MolliePaymentRequestSnapshot;
+use Vanilo\Mollie\Messages\MolliePaymentRequestSnapshotPayload;
 use Vanilo\Mollie\MolliePaymentGateway;
 use Vanilo\Payment\PaymentGateways;
+use Vanilo\Snapshot\SnapshotPayloadTypes;
 use Vanilo\Support\SnapshotTypes;
 
 class ModuleServiceProvider extends BaseModuleServiceProvider
@@ -42,7 +43,7 @@ class ModuleServiceProvider extends BaseModuleServiceProvider
             });
         }
 
-        SnapshotTypes::register(MolliePaymentRequestSnapshot::DEFAULT_ID, MolliePaymentRequestSnapshot::class);
+        SnapshotPayloadTypes::class::register(MolliePaymentRequestSnapshotPayload::DEFAULT_ID, MolliePaymentRequestSnapshotPayload::class);
 
         $this->publishes([
             $this->getBasePath() . '/' . $this->concord->getConvention()->viewsFolder() =>
