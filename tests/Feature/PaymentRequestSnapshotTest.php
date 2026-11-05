@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Vanilo\Mollie\Tests\Feature;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\Test;
 use Vanilo\Mollie\Messages\MolliePaymentRequest;

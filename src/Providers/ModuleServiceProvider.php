@@ -10,7 +10,6 @@ use Vanilo\Mollie\Messages\MolliePaymentRequestSnapshotPayload;
 use Vanilo\Mollie\MolliePaymentGateway;
 use Vanilo\Payment\PaymentGateways;
 use Vanilo\Snapshot\SnapshotPayloadTypes;
-use Vanilo\Support\SnapshotTypes;
 
 class ModuleServiceProvider extends BaseModuleServiceProvider
 {
@@ -22,7 +21,6 @@ class ModuleServiceProvider extends BaseModuleServiceProvider
             return Configuration::fromArray($this->config());
         });
     }
-
 
     public function boot(): void
     {

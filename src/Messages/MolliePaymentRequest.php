@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Vanilo\Mollie\Messages;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\View;
 use Mollie\Api\MollieApiClient;

@@ -28,5 +28,4 @@ trait CreatesTestPayment
 
         return $payment;
     }
-
 }

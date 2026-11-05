@@ -23,13 +23,12 @@ class MolliePaymentRequestSnapshotPayload implements SnapshotPayload
 
     public static function fromArray(array $data, SnapshotMetadata $meta): static
     {
-        if ($meta->version !== self::VERSION) {
+        if (self::VERSION !== $meta->version) {
             throw new \InvalidArgumentException(sprintf('Invalid snapshot version. Expected %d, got %s', self::VERSION, $meta->version));
         }
 
         return new static($data, $meta->takenAt, $meta->validUntil);
     }
-
 
     public function version(): int
     {
