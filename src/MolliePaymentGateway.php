@@ -9,14 +9,17 @@ use Vanilo\Contracts\Address;
 use Vanilo\Mollie\Concerns\GetsCreatedWithConfiguration;
 use Vanilo\Mollie\Factories\RequestFactory;
 use Vanilo\Mollie\Factories\ResponseFactory;
+use Vanilo\Mollie\Messages\MolliePaymentRequest;
 use Vanilo\Mollie\Transaction\Handler;
 use Vanilo\Payment\Contracts\Payment;
 use Vanilo\Payment\Contracts\PaymentGateway;
 use Vanilo\Payment\Contracts\PaymentRequest;
 use Vanilo\Payment\Contracts\PaymentResponse;
+use Vanilo\Payment\Contracts\RestoresPaymentRequestFromSnapshot;
 use Vanilo\Payment\Contracts\TransactionHandler;
+use Vanilo\Snapshot\Contracts\Snapshot;
 
-class MolliePaymentGateway implements PaymentGateway
+class MolliePaymentGateway implements PaymentGateway, RestoresPaymentRequestFromSnapshot
 {
     use GetsCreatedWithConfiguration;
 
@@ -49,6 +52,11 @@ class MolliePaymentGateway implements PaymentGateway
             $options['webhook_url'] ?? null,
             $options['view'] ?? null,
         );
+    }
+
+    public function restorePaymentRequestFromSnapshot(Snapshot $snapshot): PaymentRequest
+    {
+        return MolliePaymentRequest::fromSnapshotPayload($snapshot->payload());
     }
 
     public function processPaymentResponse(Request $request, array $options = []): PaymentResponse

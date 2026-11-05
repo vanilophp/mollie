@@ -8,6 +8,7 @@
 - Changed minimum Mollie PHP SDK version to v2.79.1
 - Added support for Vanilo 6.1 Snapshots
 - Added functional tests for testing against the real Mollie API
+- Added support for restoring payment requests from snapshots (implements `RestoresPaymentRequestFromSnapshot`)
 
 ## 4.0.0
 #### 2026-09-25
