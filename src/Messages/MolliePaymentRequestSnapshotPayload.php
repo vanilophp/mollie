@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Vanilo\Mollie\Messages;
 
 use DateTimeImmutable;
+use Vanilo\Snapshot\Concerns\CalculatesSnapshotValidity;
 use Vanilo\Snapshot\Contracts\SnapshotPayload;
 use Vanilo\Snapshot\SnapshotMetadata;
 
 class MolliePaymentRequestSnapshotPayload implements SnapshotPayload
 {
+    use CalculatesSnapshotValidity;
+
     public const int VERSION = 2;
 
     public const string DEFAULT_ID = 'mollie_payment_request';
