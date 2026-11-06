@@ -1,7 +1,7 @@
 # Mollie for Vanilo Changelog
 
-## Unreleased
-#### 2026-XX-YY
+## 4.1.0
+#### 2026-11-06
 
 - Changed the required Vanilo version to v6.1
 - Changed the minimum Laravel versions to v12.69.0 and v13.30, respectively
